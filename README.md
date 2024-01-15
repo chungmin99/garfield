@@ -59,6 +59,8 @@ used to group and cluster gaussians in 3D!
 ```
 ns-train garfield-gauss --data /your/data/here --pipeline.garfield-ckpt outputs/your/data/garfield/.../config.yml
 ```
+
+There are two main ways to interact with the scene -- make sure to pause training first!
 1. Interactive selection
 2. Global clustering
    
