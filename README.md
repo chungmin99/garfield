@@ -6,6 +6,8 @@ This is the official implementation for [GARField](https://www.garfield.studio).
 <img src="https://www.garfield.studio/data/garfield_training.jpg" height="230px">
 </div>
 
+### TODO
+- [ ] Update GARField use section, with videos of example usage
 
 ## Installation
 1. Install nerfstudio from source. This project requires the latest version of nerfstudio
@@ -43,8 +45,9 @@ Afterwards, you can start interacting with the affinity field. Here we're using
 2. Affinity visualization between 3D point and scene: use "Click" button to
    select the point, and select `instance_interact` as the output type. 
    You might need to drag the viewer window slightly to see this output type.
-   Again, interact with the `scale` slider!  
-...example video coming soon
+   Again, interact with the `scale` slider!
+   
+⚙️...example video coming soon
 
 Also, note: the results can change a lot between 2k to 30k steps. 
 
@@ -54,11 +57,12 @@ Once the model is trained to completion, you can use the outputted config file f
 Although GARField's affinity field is optimized using NeRF geometry, it can be
 used to group and cluster gaussians in 3D!
 ```
-ns-train garfield --data /your/data/here --pipeline.garfield-ckpt outputs/your/data/garfield/.../config.yml
+ns-train garfield-gauss --data /your/data/here --pipeline.garfield-ckpt outputs/your/data/garfield/.../config.yml
 ```
 1. Interactive selection
 2. Global clustering
-...example video coming soon
+   
+⚙️...example video coming soon
 
 ## Citation
 If you use this work or find it helpful, please consider citing: (bibtex)
