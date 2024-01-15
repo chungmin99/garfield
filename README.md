@@ -18,7 +18,7 @@ cd nerfstudio
 pip install -e .
 ```
 
-2. To use GARField with Gaussian Splatting, `cuml` is required (for global clustering).
+2. To use GARField with Gaussian Splatting, [`cuml`](https://docs.rapids.ai/install) is required (for global clustering).
 The best way to install it is through conda: `conda install -c rapidsai -c conda-forge -c nvidia cuml`
 
 3. Install GARField!
