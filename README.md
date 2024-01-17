@@ -47,8 +47,7 @@ ns-train garfield --data /your/data/here
 ```
 Note that GARField will pause to generate groups using Segment-Anything at around 2000 steps
 (set by default, this can be set in GarfieldPipeline).
-Afterwards, you can start interacting with the affinity field. Here we're using
-[`donuts`](https://drive.google.com/file/d/1CK-gZ-GuxESWkbmPc3VtlEgdjd2Ijkii/view?usp=drive_link) scene from LERF.
+Afterwards, you can start interacting with the affinity field.
 1. PCA visualization of affinity field: select `instance` as the output type,
    and change the value of `scale` slider.
 
