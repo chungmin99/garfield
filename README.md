@@ -2,16 +2,22 @@
 
 This is the official implementation for [GARField](https://www.garfield.studio).
 
-Tested on Python 3.10.
+Tested on Python 3.10, cuda 12.0. 
 
 <div align='center'>
 <img src="https://www.garfield.studio/data/garfield_training.jpg" height="230px">
 </div>
 
 ## Installation
-1. Install nerfstudio from source. This project requires the latest version of nerfstudio
+1. Install nerfstudio from source, and its dependencies. This project requires the latest version of nerfstudio
 (more specifically, the new viewer based on viser).
 ```
+# install dependencies
+pip3 install torch torchvision torchaudio
+conda install -c "nvidia/label/cuda-12.0.0" cuda-toolkit
+pip install ninja git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
+
+# install nerfstudio!
 git clone git@github.com:nerfstudio-project/nerfstudio.git
 cd nerfstudio
 pip install -e .
@@ -20,7 +26,11 @@ pip install -e .
 2. To use GARField with Gaussian Splatting, [`cuml`](https://docs.rapids.ai/install) is required (for global clustering).
 The best way to install it is through conda: `conda install -c rapidsai -c conda-forge -c nvidia cuml`
 
-3. Install GARField!
+Note 1: If you get `ClobberError`, try `conda clean --all` -- see [here](https://stackoverflow.com/questions/51217876/conda-update-anaconda-fails-clobbererror). It seems that `pip` installed packages from `nerfstudio` may conflict with the `conda` install here. 
+
+Note 2: I used [`libmamba`](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community) for conda. 
+
+4. Install GARField!
 ```
 git clone git@github.com:chungmin99/garfield.git
 pip install -e .
