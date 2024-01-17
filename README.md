@@ -2,6 +2,8 @@
 
 This is the official implementation for [GARField](https://www.garfield.studio).
 
+Tested on Python 3.10.
+
 <div align='center'>
 <img src="https://www.garfield.studio/data/garfield_training.jpg" height="230px">
 </div>
