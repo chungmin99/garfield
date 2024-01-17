@@ -6,9 +6,6 @@ This is the official implementation for [GARField](https://www.garfield.studio).
 <img src="https://www.garfield.studio/data/garfield_training.jpg" height="230px">
 </div>
 
-### TODO
-- [ ] Update GARField use section, with videos of example usage
-
 ## Installation
 1. Install nerfstudio from source. This project requires the latest version of nerfstudio
 (more specifically, the new viewer based on viser).
@@ -65,11 +62,19 @@ ns-train garfield-gauss --data /your/data/here --pipeline.garfield-ckpt outputs/
 ```
 
 There are two main ways to interact with the scene -- make sure to pause training first!
-1. Interactive selection
-2. Global clustering
-   
-⚙️...example video coming soon
+1. Interactive selection: click anywhere in the scene, and use "Crop to Click" button to retrieve different groups. Use "Drag Current Crop" to move it around!
 
+
+https://github.com/chungmin99/garfield/assets/10284938/82ea7145-d8d1-485d-bab2-f6e8b0ebd632
+
+
+2. Global clustering: cluster the currently visible gaussians (either globally or just for the crop), at the scale specified by "Cluster Scale".
+
+
+https://github.com/chungmin99/garfield/assets/10284938/541fe037-925c-418f-929d-a9397f8d57d3
+
+
+   
 ## Citation
 If you use this work or find it helpful, please consider citing: (bibtex)
 
