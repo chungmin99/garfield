@@ -42,12 +42,16 @@ Afterwards, you can start interacting with the affinity field. Here we're using
 [`donuts`](https://drive.google.com/file/d/1CK-gZ-GuxESWkbmPc3VtlEgdjd2Ijkii/view?usp=drive_link) scene from LERF.
 1. PCA visualization of affinity field: select `instance` as the output type,
    and change the value of `scale` slider.
+
+https://github.com/chungmin99/garfield/assets/10284938/e193d7e8-da7c-4176-b7c5-a7ec75513c16
+
 2. Affinity visualization between 3D point and scene: use "Click" button to
    select the point, and select `instance_interact` as the output type. 
    You might need to drag the viewer window slightly to see this output type.
    Again, interact with the `scale` slider!
-   
-⚙️...example video coming soon
+Here, with `invert` True and output unnormalized, red color means high affinity (i.e., features at click point and rendered point are close to each other). Blue means low affinity. 
+
+https://github.com/chungmin99/garfield/assets/10284938/6edbdad6-d356-4b32-b44e-0df8ec1dca16
 
 Also, note: the results can change a lot between 2k to 30k steps. 
 
