@@ -41,6 +41,9 @@ Note that `garfield-gauss` requires reference to a fully trained `garfield` chec
 as it relies on the affinity field from `garfield`. See the main paper for more details.
 
 ## Running GARField
+
+Note: using colmap-based data makes running both `garfield` and `garfield-gauss`, since Gaussian Splatting in nerfstudio is best supported with it. 
+
 You can use it like any other third-party nerfstudio project.
 ```
 ns-train garfield --data /your/data/here
