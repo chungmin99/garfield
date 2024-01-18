@@ -76,7 +76,7 @@ ns-train garfield-gauss --data /your/data/here --pipeline.garfield-ckpt outputs/
 ```
 
 There are two main ways to interact with the scene -- make sure to pause training first!
-1. Interactive selection: click anywhere in the scene, and use "Crop to Click" button to retrieve different groups. Use "Drag Current Crop" to move it around!
+1. Interactive selection: click anywhere in the scene, and use "Crop to Click" button to retrieve different groups (scale=group level*0.05). Use "Drag Current Crop" to move it around!
 
 
 https://github.com/chungmin99/garfield/assets/10284938/82ea7145-d8d1-485d-bab2-f6e8b0ebd632
