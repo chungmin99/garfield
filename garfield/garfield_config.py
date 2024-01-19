@@ -11,7 +11,7 @@ from nerfstudio.engine.trainer import TrainerConfig
 from nerfstudio.data.datamanagers.full_images_datamanager import (
     FullImageDatamanagerConfig,
 )
-from nerfstudio.models.gaussian_splatting import GaussianSplattingModelConfig
+from nerfstudio.models.splatfacto import SplatfactoModelConfig
 from nerfstudio.data.dataparsers.colmap_dataparser import ColmapDataParserConfig
 
 from garfield.garfield_pipeline import GarfieldPipelineConfig
@@ -101,7 +101,7 @@ garfield_gauss_method = MethodSpecification(
             datamanager=FullImageDatamanagerConfig(
                 dataparser=ColmapDataParserConfig(load_3D_points=True),
             ),
-            model=GaussianSplattingModelConfig(
+            model=SplatfactoModelConfig(
                 cull_alpha_thresh=0.2,
                 use_scale_regularization=True,
             ),

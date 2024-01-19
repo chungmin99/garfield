@@ -15,10 +15,10 @@ from nerfstudio.pipelines.base_pipeline import VanillaPipeline, VanillaPipelineC
 from torch.cuda.amp.grad_scaler import GradScaler
 from nerfstudio.viewer.viewer_elements import *
 from nerfstudio.viewer.viewer import VISER_NERFSTUDIO_SCALE_RATIO
-from nerfstudio.models.gaussian_splatting import GaussianSplattingModel
+from nerfstudio.models.splatfacto import SplatfactoModel
 
 from cuml.cluster.hdbscan import HDBSCAN
-from nerfstudio.models.gaussian_splatting import RGB2SH
+from nerfstudio.models.splatfacto import RGB2SH
 
 import tqdm
 
@@ -60,7 +60,7 @@ class GarfieldGaussianPipeline(VanillaPipeline):
 
     Note that the pipeline training must be stopped before you can interact with the scene!!
     """
-    model: GaussianSplattingModel
+    model: SplatfactoModel
     garfield_pipeline: List[GarfieldPipeline]  # To avoid importing Viewer* from nerf pipeline
     state_stack: List[Dict[str, TensorType]]  # To revert to previous state
     click_location: Optional[TensorType]  # For storing click location
