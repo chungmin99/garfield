@@ -28,7 +28,7 @@ The best way to install it is through conda: `conda install -c rapidsai -c conda
 
 Note 1: If you get `ClobberError`, try `conda clean --all` -- see [here](https://stackoverflow.com/questions/51217876/conda-update-anaconda-fails-clobbererror). It seems that `pip` installed packages from `nerfstudio` may conflict with the `conda` install here. 
 
-Note 2: I used [`libmamba`](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community) for conda. 
+Note 2: I used [`libmamba`](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community) for conda. I have been told multiple times that the conda solver is very slow, but this seems to be key. 
 
 4. Install GARField!
 ```
