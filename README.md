@@ -42,7 +42,7 @@ as it relies on the affinity field from `garfield`. See the main paper for more 
 
 ## Running GARField
 
-Note: using colmap-based data makes running both `garfield` and `garfield-gauss`, since Gaussian Splatting in nerfstudio is best supported with it. 
+Note: using colmap-based image data makes it more convenient to run both `garfield` and `garfield-gauss` on the same dataset. Gaussian Splatting in nerfstudio is best supported with colmap... 
 
 You can use it like any other third-party nerfstudio project.
 ```
