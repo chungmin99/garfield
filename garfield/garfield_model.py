@@ -61,6 +61,7 @@ class GarfieldModel(NerfactoModel):
     def populate_modules(self):
         super().populate_modules()
         self.renderer_feat = FeatureRenderer()
+        self.config.instance_field.use_single_scale = self.config.use_single_scale
         self.grouping_field = self.config.instance_field.setup()
         
         # Add a slider to the viewer to control the scale of the grouping field.
