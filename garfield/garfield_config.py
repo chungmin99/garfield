@@ -42,7 +42,7 @@ garfield_method = MethodSpecification(
                 ),
                 img_group_model=ImgGroupModelConfig(
                     model_type="sam_hf",  
-                    # Can choose out of "sam_fb", "sam_hf", "maskformer"
+                    # Can choose out of "sam_fb", "sam_hf", "maskformer", "superpixel"
                     # Used sam_fb for the paper, see `img_group_model.py`. 
                     device="cuda",
                 ),
