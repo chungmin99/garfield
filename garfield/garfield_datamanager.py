@@ -94,20 +94,21 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
 
             pixel_level_keys_list, scales_3d_list, group_cdf_list = [], [], []
 
-            for i in range(len(sam_data.keys()) // 3):
+            num_entries = len(sam_data["pixel_level_keys"].keys())
+            for i in range(num_entries):
                 pixel_level_keys_list.append(
                     torch.from_numpy(sam_data["pixel_level_keys"][str(i)][...])
                 )
             self.pixel_level_keys = torch.nested.nested_tensor(pixel_level_keys_list)
             del pixel_level_keys_list
 
-            for i in range(len(sam_data.keys()) // 3):
+            for i in range(num_entries):
                 scales_3d_list.append(torch.from_numpy(sam_data["scale_3d"][str(i)][...]))
             self.scale_3d = torch.nested.nested_tensor(scales_3d_list)
             self.scale_3d_statistics = torch.cat(scales_3d_list)
             del scales_3d_list
 
-            for i in range(len(sam_data.keys()) // 3):
+            for i in range(num_entries):
                 group_cdf_list.append(torch.from_numpy(sam_data["group_cdf"][str(i)][...]))
             self.group_cdf = torch.nested.nested_tensor(group_cdf_list)
             del group_cdf_list
