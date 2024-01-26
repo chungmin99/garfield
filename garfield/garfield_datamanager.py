@@ -123,7 +123,9 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
         # make the directory if it doesn't exist
         if not osp.exists(self.sam_data_path.parent):
             os.makedirs(self.sam_data_path.parent)
-        with h5py.File(self.sam_data_path, "w") as f:
+
+        # Append, not overwrite -- in case of multiple runs with different settings.
+        with h5py.File(self.sam_data_path, "a") as f:
             for i in range(len(pixel_level_keys)):
                 f.create_dataset(f"{prefix}/pixel_level_keys/{i}", data=pixel_level_keys[i])
                 f.create_dataset(f"{prefix}/scale_3d/{i}", data=scale_3d[i])
