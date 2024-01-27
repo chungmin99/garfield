@@ -40,6 +40,12 @@ This installs both `garfield` (NeRF geometry), and `garfield-gauss` (Gaussian ge
 Note that `garfield-gauss` requires reference to a fully trained `garfield` checkpoint,
 as it relies on the affinity field from `garfield`. See the main paper for more details.
 
+4. (Optional) If you wish to use a different version of the SAM model (by default, the Hugging Face Transformer's SAM model facebook/sam-vit-huge is used), please install the 'segment_anything' package.
+
+```
+pip install git+https://github.com/facebookresearch/segment-anything.git
+```
+
 ## Running GARField
 
 Note: using colmap-based image data makes it more convenient to run both `garfield` and `garfield-gauss` on the same dataset. Gaussian Splatting in nerfstudio is best supported with colmap... 
