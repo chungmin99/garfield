@@ -17,6 +17,7 @@ from rich.progress import Console
 CONSOLE = Console(width=120)
 
 import h5py
+import os
 import os.path as osp
 
 
@@ -83,26 +84,32 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
         Loads the SAM data (masks, 3D scales, etc.) through hdf5.
         If the file doesn't exist, returns False.
         """
+        prefix = self.img_group_model.config.model_type
         if osp.exists(self.sam_data_path):
             sam_data = h5py.File(self.sam_data_path, "r")
+            if prefix not in sam_data.keys():
+                return False
+
+            sam_data = sam_data[prefix]
 
             pixel_level_keys_list, scales_3d_list, group_cdf_list = [], [], []
 
-            for i in range(len(sam_data.keys()) // 3):
+            num_entries = len(sam_data["pixel_level_keys"].keys())
+            for i in range(num_entries):
                 pixel_level_keys_list.append(
-                    torch.from_numpy(sam_data[f"pixel_level_keys_{i}"][...])
+                    torch.from_numpy(sam_data["pixel_level_keys"][str(i)][...])
                 )
             self.pixel_level_keys = torch.nested.nested_tensor(pixel_level_keys_list)
             del pixel_level_keys_list
 
-            for i in range(len(sam_data.keys()) // 3):
-                scales_3d_list.append(torch.from_numpy(sam_data[f"scale_3d_{i}"][...]))
+            for i in range(num_entries):
+                scales_3d_list.append(torch.from_numpy(sam_data["scale_3d"][str(i)][...]))
             self.scale_3d = torch.nested.nested_tensor(scales_3d_list)
             self.scale_3d_statistics = torch.cat(scales_3d_list)
             del scales_3d_list
 
-            for i in range(len(sam_data.keys()) // 3):
-                group_cdf_list.append(torch.from_numpy(sam_data[f"group_cdf_{i}"][...]))
+            for i in range(num_entries):
+                group_cdf_list.append(torch.from_numpy(sam_data["group_cdf"][str(i)][...]))
             self.group_cdf = torch.nested.nested_tensor(group_cdf_list)
             del group_cdf_list
 
@@ -112,11 +119,17 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
 
     def save_sam_data(self, pixel_level_keys, scale_3d, group_cdf):
         """Save the SAM grouping data to hdf5."""
-        with h5py.File(self.sam_data_path, "w") as f:
+        prefix = self.img_group_model.config.model_type
+        # make the directory if it doesn't exist
+        if not osp.exists(self.sam_data_path.parent):
+            os.makedirs(self.sam_data_path.parent)
+
+        # Append, not overwrite -- in case of multiple runs with different settings.
+        with h5py.File(self.sam_data_path, "a") as f:
             for i in range(len(pixel_level_keys)):
-                f.create_dataset(f"pixel_level_keys_{i}", data=pixel_level_keys[i])
-                f.create_dataset(f"scale_3d_{i}", data=scale_3d[i])
-                f.create_dataset(f"group_cdf_{i}", data=group_cdf[i])
+                f.create_dataset(f"{prefix}/pixel_level_keys/{i}", data=pixel_level_keys[i])
+                f.create_dataset(f"{prefix}/scale_3d/{i}", data=scale_3d[i])
+                f.create_dataset(f"{prefix}/group_cdf/{i}", data=group_cdf[i])
 
     @staticmethod
     def create_pixel_mask_array(masks: torch.Tensor):

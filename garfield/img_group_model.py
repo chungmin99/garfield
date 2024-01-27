@@ -56,6 +56,9 @@ class ImgGroupModel:
         self.device = self.config.device = self.kwargs["device"]
         self.model = None
 
+        # also, assert that model_type doesn't have a "/" in it! Will mess with h5df.
+        assert "/" not in self.config.model_type, "model_type cannot have a '/' in it!"
+
     def __call__(self, img: np.ndarray):
         # takes in range 0-255... HxWx3
         # For using huggingface transformer's SAM model
