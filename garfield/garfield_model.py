@@ -113,7 +113,12 @@ class GarfieldModel(NerfactoModel):
         )
 
         # Define the scale for each sample. If the scale is not provided, use the selected scale.
+        # "scale" is included in ray_bundle.metadata only from training batches, but
+        # this would be good way to override the scale during inference.
         if self.training and ("scale" in ray_bundle.metadata):
+            scales = ray_bundle.metadata["scale"]
+            instance_scales = scales.view(grouping_samples.shape[0], 1)
+        elif "scale" in ray_bundle.metadata:
             scales = ray_bundle.metadata["scale"]
             instance_scales = scales.view(grouping_samples.shape[0], 1)
         else:
