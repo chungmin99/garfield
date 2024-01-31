@@ -100,7 +100,7 @@ If you use this work or find it helpful, please consider citing: (bibtex)
 
 ```
 @inproceedings{garfield2024,
- author = {Kim, Chung Min and Wu, Mingxuan and Kerr, Justin and Tancik, Matthew and Goldberg, Ken and Kanazawa, Angjoo},
+ author = {Kim, Chung Min* and Wu, Mingxuan* and Kerr, Justin* and Tancik, Matthew and Goldberg, Ken and Kanazawa, Angjoo},
  title = {GARField: Group Anything with Radiance Fields},
  booktitle = {arXiv},
  year = {2024},
