@@ -48,7 +48,7 @@ pip install git+https://github.com/facebookresearch/segment-anything.git
 
 ## Running GARField
 
-Note: using colmap-based image data makes it more convenient to run both `garfield` and `garfield-gauss` on the same dataset. Gaussian Splatting in nerfstudio is best supported with colmap... 
+Note: using colmap-based image data makes it more convenient to run both `garfield` and `garfield-gauss` on the same dataset. Although `splatfacto` (Gaussian Splatting in nerfstudio) is supported with `NerfstudioDataParser`, and also supports random point initialization with non-colmap datasets, the NeRF and GS geometries will align better with colmap since 1) we will start from colmap points and 2) camera optimization is minimized.
 
 You can use it like any other third-party nerfstudio project.
 ```
