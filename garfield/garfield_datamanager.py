@@ -262,7 +262,8 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
         mask_id = torch.zeros((indices.shape[0],), device=self.device)
         scale = torch.zeros((indices.shape[0],), device=self.device)
 
-        random_vec = (torch.rand((1,)) * torch.ones((npximg,))).view(-1, 1)
+        random_vec_sampling = (torch.rand((1,)) * torch.ones((npximg,))).view(-1, 1)
+        random_vec_densify = (torch.rand((1,)) * torch.ones((npximg,))).view(-1, 1)
 
         for i in range(0, indices.shape[0], npximg):
             img_idx = img_ind[i]
@@ -272,7 +273,7 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
                 x_ind[i : i + npximg], y_ind[i : i + npximg]
             ]
             random_index = torch.sum(
-                random_vec.view(-1, 1)
+                random_vec_sampling.view(-1, 1)
                 > self.group_cdf[img_idx][x_ind[i : i + npximg], y_ind[i : i + npximg]],
                 dim=-1,
             )
@@ -291,7 +292,7 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
             curr_scale = self.scale_3d[img_idx][per_pixel_mask]
             curr_scale[random_index == 0] = (
                 self.scale_3d[img_idx][per_pixel_mask][random_index == 0]
-                * random_vec[random_index == 0]
+                * random_vec_densify[random_index == 0]
             )
             for j in range(1, self.group_cdf[img_idx].shape[-1]):
                 if (random_index == j).sum() == 0:
@@ -302,7 +303,7 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
                         self.scale_3d[img_idx][per_pixel_mask][random_index == j]
                         - self.scale_3d[img_idx][per_pixel_mask_][random_index == j]
                     )
-                    * random_vec[random_index == j]
+                    * random_vec_densify[random_index == j]
                 )
             scale[i : i + npximg] = curr_scale.squeeze().to(self.device)
 
