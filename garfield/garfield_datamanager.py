@@ -178,9 +178,25 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
         depth = depth.view(-1, 1)  # (H*W, 1)
         point = point.view(-1, 3)  # (H*W, 3)
 
+        def helper_return_no_masks():
+            # Fail gracefully when no masks are found.
+            # Create dummy data (all -1s), which will be ignored later.
+            # See: `get_loss_dict_group` in `garfield_model.py`
+            pixel_level_keys = torch.full(
+                (image_shape[0], image_shape[1], 1), -1, dtype=torch.int
+            )
+            scale = torch.Tensor([0.0]).view(-1, 1)
+            mask_cdf = torch.full(
+                (image_shape[0], image_shape[1], 1), 1, dtype=torch.float
+            )
+            return (pixel_level_keys, scale, mask_cdf)
+
         # Calculate SAM masks
         masks = self.img_group_model((rgb.numpy() * 255).astype(np.uint8))
-        # masks = sorted(masks, key=lambda x: x["area"])
+
+        # If no masks are found, return dummy data.
+        if len(masks) == 0:
+            return helper_return_no_masks()
 
         sam_mask = []
         scale = []
@@ -209,6 +225,10 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
             if extent.item() < max_scale:
                 sam_mask.append(curr_mask.reshape(image_shape))
                 scale.append(extent.item())
+
+        # If no masks are found, after postprocessing, return dummy data.
+        if len(sam_mask) == 0:
+            return helper_return_no_masks()
 
         sam_mask = torch.stack(sam_mask)  # (num_masks, H, W)
         scale = torch.Tensor(scale).view(-1, 1).to(self.device)  # (num_masks, 1)
@@ -277,14 +297,21 @@ class GarfieldDataManager(VanillaDataManager):  # pylint: disable=abstract-metho
                 > self.group_cdf[img_idx][x_ind[i : i + npximg], y_ind[i : i + npximg]],
                 dim=-1,
             )
-            per_pixel_mask = torch.gather(
-                per_pixel_index, 1, random_index.unsqueeze(-1)
-            ).squeeze()
-            per_pixel_mask_ = torch.gather(
-                per_pixel_index,
-                1,
-                torch.max(random_index.unsqueeze(-1) - 1, torch.Tensor([0]).int()),
-            ).squeeze()
+
+            # `per_pixel_index` encodes the list of groups that each pixel belongs to.
+            # If there's only one group, then `per_pixel_index` is a 1D tensor
+            # -- this will mess up the future `gather` operations.
+            if per_pixel_index.shape[-1] == 1:
+                per_pixel_mask = per_pixel_index.squeeze()
+            else:
+                per_pixel_mask = torch.gather(
+                    per_pixel_index, 1, random_index.unsqueeze(-1)
+                ).squeeze()
+                per_pixel_mask_ = torch.gather(
+                    per_pixel_index,
+                    1,
+                    torch.max(random_index.unsqueeze(-1) - 1, torch.Tensor([0]).int()),
+                ).squeeze()
 
             mask_id[i : i + npximg] = per_pixel_mask.to(self.device)
 
