@@ -99,7 +99,7 @@ garfield_gauss_method = MethodSpecification(
 
         pipeline=GarfieldGaussianPipelineConfig(
             datamanager=FullImageDatamanagerConfig(
-                dataparser=ColmapDataParserConfig(load_3D_points=True),
+                dataparser=NerfstudioDataParserConfig(load_3D_points=True),
             ),
             model=SplatfactoModelConfig(
                 cull_alpha_thresh=0.2,

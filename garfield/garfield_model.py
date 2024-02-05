@@ -84,18 +84,18 @@ class GarfieldModel(NerfactoModel):
             return outputs
 
         # Recalculate ray samples and weights
+        # ... only if the model is in eval mode, where it should be no_grad(). 
+        # If in training mode, `outputs` should already have calculated ray samples and weights.
+        # Without this if-block, camera optimizer? gradients? seem to get messed up.
         ray_samples: RaySamples
-        ray_samples, weights_list, ray_samples_list = self.proposal_sampler(
-            ray_bundle, density_fns=self.density_fns
-        )
-        field_outputs = self.field.forward(
-            ray_samples, compute_normals=self.config.predict_normals
-        )
-        if self.config.use_gradient_scaling:
-            field_outputs = scale_gradients_by_distance_squared(
-                field_outputs, ray_samples
-            )
-        weights = ray_samples.get_weights(field_outputs[FieldHeadNames.DENSITY])
+        if self.training:
+            ray_samples, weights = outputs["ray_samples_list"][-1], outputs["weights_list"][-1]
+        else:
+            ray_samples, weights_list, ray_samples_list = self.proposal_sampler(ray_bundle, density_fns=self.density_fns)
+            field_outputs = self.field.forward(ray_samples, compute_normals=self.config.predict_normals)
+            if self.config.use_gradient_scaling:
+                field_outputs = scale_gradients_by_distance_squared(field_outputs, ray_samples)
+            weights = ray_samples.get_weights(field_outputs[FieldHeadNames.DENSITY])
 
         # Choose the top k samples with the highest weights, to be used for grouping.
         # This is to decrease # of samples queried for grouping, while sampling close to the scene density.
@@ -113,7 +113,12 @@ class GarfieldModel(NerfactoModel):
         )
 
         # Define the scale for each sample. If the scale is not provided, use the selected scale.
+        # "scale" is included in ray_bundle.metadata only from training batches, but
+        # this would be good way to override the scale during inference.
         if self.training and ("scale" in ray_bundle.metadata):
+            scales = ray_bundle.metadata["scale"]
+            instance_scales = scales.view(grouping_samples.shape[0], 1)
+        elif "scale" in ray_bundle.metadata:
             scales = ray_bundle.metadata["scale"]
             instance_scales = scales.view(grouping_samples.shape[0], 1)
         else:
