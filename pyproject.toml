@@ -3,7 +3,7 @@ name = "garfield"
 version = "0.1.0"
 
 dependencies=[
-    "nerfstudio>=0.3.4",
+    "nerfstudio>=1.0.0",
     "transformers",
     "gsplat",
     "trimesh",
