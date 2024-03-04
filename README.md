@@ -1,4 +1,4 @@
-<img width="943" alt="image" src="https://github.com/chungmin99/garfield/assets/10284938/1b184aa7-1fad-4d48-a603-c0cbc433775d"># <img src="https://www.garfield.studio/data/favicon.png" height="30px"> GARField: Group Anything with Radiance Fields
+# <img src="https://www.garfield.studio/data/favicon.png" height="30px"> GARField: Group Anything with Radiance Fields
 
 This is the official implementation for [GARField](https://www.garfield.studio).
 
