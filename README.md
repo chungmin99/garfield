@@ -1,4 +1,4 @@
-# <img src="https://www.garfield.studio/data/favicon.png" height="30px"> GARField: Group Anything with Radiance Fields
+<img width="943" alt="image" src="https://github.com/chungmin99/garfield/assets/10284938/1b184aa7-1fad-4d48-a603-c0cbc433775d"># <img src="https://www.garfield.studio/data/favicon.png" height="30px"> GARField: Group Anything with Radiance Fields
 
 This is the official implementation for [GARField](https://www.garfield.studio).
 
@@ -25,6 +25,8 @@ pip install -e .
 
 2. To use GARField with Gaussian Splatting, [`cuml`](https://docs.rapids.ai/install) is required (for global clustering).
 The best way to install it is through conda: `conda install -c rapidsai -c conda-forge -c nvidia cuml`
+
+, or with pip: `pip install --extra-index-url=https://pypi.nvidia.com cudf-cu12==24.2.* cuml-cu12==24.2.*`.
 
 Important: I used [`libmamba`](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community) for conda. I have been told multiple times that the conda solver is very slow / gets stuck, but this seems to be key. 
 
