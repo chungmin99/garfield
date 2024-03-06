@@ -107,7 +107,7 @@ garfield_gauss_method = MethodSpecification(
             ),
         ),
         optimizers={
-            "xyz": {
+            "means": {
                 "optimizer": AdamOptimizerConfig(lr=1.6e-4, eps=1e-15),
                 "scheduler": ExponentialDecaySchedulerConfig(
                     lr_final=1.6e-6,
@@ -122,15 +122,15 @@ garfield_gauss_method = MethodSpecification(
                 "optimizer": AdamOptimizerConfig(lr=0.0025 / 20, eps=1e-15),
                 "scheduler": None,
             },
-            "opacity": {
+            "opacities": {
                 "optimizer": AdamOptimizerConfig(lr=0.05, eps=1e-15),
                 "scheduler": None,
             },
-            "scaling": {
+            "scales": {
                 "optimizer": AdamOptimizerConfig(lr=0.005, eps=1e-15),
                 "scheduler": None,
             },
-            "rotation": {"optimizer": AdamOptimizerConfig(lr=0.001, eps=1e-15), "scheduler": None},
+            "quats": {"optimizer": AdamOptimizerConfig(lr=0.001, eps=1e-15), "scheduler": None},
             "camera_opt": {
                 "optimizer": AdamOptimizerConfig(lr=1e-3, eps=1e-15),
                 "scheduler": ExponentialDecaySchedulerConfig(lr_final=5e-5, max_steps=30000),
