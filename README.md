@@ -26,6 +26,8 @@ pip install -e .
 2. To use GARField with Gaussian Splatting, [`cuml`](https://docs.rapids.ai/install) is required (for global clustering).
 The best way to install it is through conda: `conda install -c rapidsai -c conda-forge -c nvidia cuml`
 
+, or with pip: `pip install --extra-index-url=https://pypi.nvidia.com cudf-cu12==24.2.* cuml-cu12==24.2.*`.
+
 Important: I used [`libmamba`](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community) for conda. I have been told multiple times that the conda solver is very slow / gets stuck, but this seems to be key. 
 
 If you get `ClobberError`, try `conda clean --all` -- see [here](https://stackoverflow.com/questions/51217876/conda-update-anaconda-fails-clobbererror). It seems that `pip` installed packages from `nerfstudio` may conflict with the `conda` install here. 
