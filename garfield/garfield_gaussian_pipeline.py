@@ -150,12 +150,8 @@ class GarfieldGaussianPipeline(VanillaPipeline):
         """Revert to previous saved state"""
         assert len(self.state_stack) > 0, "No previous state to revert to"
         prev_state = self.state_stack.pop()
-        self.model.means = torch.nn.Parameter(prev_state['means'])
-        self.model.scales = torch.nn.Parameter(prev_state['scales'])
-        self.model.quats = torch.nn.Parameter(prev_state['quats'])
-        self.model.features_dc = torch.nn.Parameter(prev_state['features_dc'])
-        self.model.features_rest = torch.nn.Parameter(prev_state['features_rest'])
-        self.model.opacities = torch.nn.Parameter(prev_state['opacities'])
+        for name in self.model.gauss_params.keys():
+            self.model.gauss_params[name] = prev_state[name]
 
         self.click_location = None
         if self.click_handle is not None:
@@ -180,14 +176,8 @@ class GarfieldGaussianPipeline(VanillaPipeline):
 
     def _queue_state(self):
         """Save current state to stack"""
-        self.state_stack.append({
-            'means': self.model.means.detach().clone(),
-            'scales': self.model.scales.detach().clone(),
-            'quats': self.model.quats.detach().clone(),
-            'features_dc': self.model.features_dc.detach().clone(),
-            'features_rest': self.model.features_rest.detach().clone(),
-            'opacities': self.model.opacities.detach().clone(),
-        })
+        import copy
+        self.state_stack.append(copy.deepcopy(self.model.gauss_params))
         self.reset_state.set_disabled(False)
 
     def _click_gaussian(self, button: ViewerButton):
@@ -241,7 +231,7 @@ class GarfieldGaussianPipeline(VanillaPipeline):
         assert self.click_location is not None, "Need to specify click location"
 
         self._queue_state()  # Save current state
-        curr_means = self.model.means.detach()
+        curr_means = self.model.gauss_params['means'].detach()
         self.model.eval()
 
         # The only way to reset is to reset the state using the reset button.
@@ -373,19 +363,15 @@ class GarfieldGaussianPipeline(VanillaPipeline):
 
         keep_inds = self.crop_group_list[number.value]
         prev_state = self.state_stack[-1]
-        self.model.means = torch.nn.Parameter(prev_state['means'][keep_inds])
-        self.model.scales = torch.nn.Parameter(prev_state['scales'][keep_inds])
-        self.model.quats = torch.nn.Parameter(prev_state['quats'][keep_inds])
-        self.model.features_dc = torch.nn.Parameter(prev_state['features_dc'][keep_inds])
-        self.model.features_rest = torch.nn.Parameter(prev_state['features_rest'][keep_inds])
-        self.model.opacities = torch.nn.Parameter(prev_state['opacities'][keep_inds])
+        for name in self.model.gauss_params.keys():
+            self.model.gauss_params[name] = prev_state[name][keep_inds]
 
     def _drag_current_crop(self, button: ViewerButton):
         """Add a transform control to the current scene, and update the model accordingly."""
         self.crop_to_group_level.set_disabled(True)  # Disable user from changing crop
         self.move_current_crop.set_disabled(True)  # Disable user from creating another drag handle
         
-        scene_centroid = self.model.means.detach().mean(dim=0)
+        scene_centroid = self.model.gauss_params['means'].detach().mean(dim=0)
         self.crop_transform_handle = self.viewer_control.viser_server.add_transform_controls(
             name=f"/scene_transform",
             position=(VISER_NERFSTUDIO_SCALE_RATIO*scene_centroid).cpu().numpy(),
@@ -394,15 +380,11 @@ class GarfieldGaussianPipeline(VanillaPipeline):
         # Visualize the whole scene -- the points corresponding to the crop will be controlled by the transform handle.
         crop_inds = self.crop_group_list[self.crop_to_group_level.value]
         prev_state = self.state_stack[-1]
-        self.model.means = torch.nn.Parameter(prev_state['means'].clone())
-        self.model.scales = torch.nn.Parameter(prev_state['scales'].clone())
-        self.model.quats = torch.nn.Parameter(prev_state['quats'].clone())
-        self.model.features_dc = torch.nn.Parameter(prev_state['features_dc'].clone())
-        self.model.features_rest = torch.nn.Parameter(prev_state['features_rest'].clone())
-        self.model.opacities = torch.nn.Parameter(prev_state['opacities'].clone())
+        for name in self.model.gauss_params.keys():
+            self.model.gauss_params[name] = prev_state[name].clone()
 
-        curr_means = self.model.means.clone().detach()
-        curr_rotmats = quat_to_rotmat(self.model.quats[crop_inds].detach())
+        curr_means = self.model.gauss_params['means'].clone().detach()
+        curr_rotmats = quat_to_rotmat(self.model.gauss_params['quats'][crop_inds].detach())
 
         @self.crop_transform_handle.on_update
         def _(_):
@@ -410,8 +392,8 @@ class GarfieldGaussianPipeline(VanillaPipeline):
             handle_position = handle_position / VISER_NERFSTUDIO_SCALE_RATIO
             handle_rotmat = quat_to_rotmat(torch.tensor(self.crop_transform_handle.wxyz).to(self.device).float())
 
-            means = self.model.means.detach()
-            quats = self.model.quats.detach()
+            means = self.model.gauss_params['means'].detach()
+            quats = self.model.gauss_params['quats'].detach()
 
             means[crop_inds] = handle_position.float() + torch.matmul(
                 handle_rotmat, (curr_means[crop_inds] - curr_means[crop_inds].mean(dim=0)).T
@@ -421,8 +403,8 @@ class GarfieldGaussianPipeline(VanillaPipeline):
             ).as_quat()).to(self.device)  # this is in xyzw format
             quats[crop_inds] = quats[crop_inds][:, [3, 0, 1, 2]]  # convert to wxyz format
 
-            self.model.means = torch.nn.Parameter(means.float())
-            self.model.quats = torch.nn.Parameter(quats.float())
+            self.model.gauss_params['means'] = torch.nn.Parameter(means.float())
+            self.model.gauss_params['quats'] = torch.nn.Parameter(quats.float())
 
             self.viewer_control.viewer._trigger_rerender()  # trigger viewer rerender
 
@@ -436,16 +418,16 @@ class GarfieldGaussianPipeline(VanillaPipeline):
 
         labels = self.cluster_labels
 
-        features_dc = self.model.features_dc.detach()
-        features_rest = self.model.features_rest.detach()
+        features_dc = self.model.gauss_params['features_dc'].detach()
+        features_rest = self.model.gauss_params['features_rest'].detach()
         for c_id in range(0, labels.max().int().item() + 1):
             # set the colors of the gaussians accordingly using colormap from matplotlib
             cluster_mask = np.where(labels == c_id)
-            features_dc[cluster_mask] = RGB2SH(colormap[c_id, :3].to(self.model.features_dc))
+            features_dc[cluster_mask] = RGB2SH(colormap[c_id, :3].to(self.model.gauss_params['features_dc']))
             features_rest[cluster_mask] = 0
 
-        self.model.features_dc = torch.nn.Parameter(self.model.features_dc)
-        self.model.features_rest = torch.nn.Parameter(self.model.features_rest)
+        self.model.gauss_params['features_dc'] = torch.nn.Parameter(self.model.gauss_params['features_dc'])
+        self.model.gauss_params['features_rest'] = torch.nn.Parameter(self.model.gauss_params['features_rest'])
         self.cluster_scene_shuffle_colors.set_disabled(False)
 
     def _cluster_scene(self, button: ViewerButton):
@@ -458,7 +440,7 @@ class GarfieldGaussianPipeline(VanillaPipeline):
         scale = self.cluster_scene_scale.value
         grouping_model = self.garfield_pipeline[0].model
         
-        positions = self.model.means.detach()
+        positions = self.model.gauss_params['means'].detach()
         group_feats = grouping_model.get_grouping_at_points(positions, scale).cpu().numpy()  # (N, 256)
         positions = positions.cpu().numpy()
 
@@ -539,21 +521,21 @@ class GarfieldGaussianPipeline(VanillaPipeline):
 
         colormap = self.colormap
 
-        opacities = self.model.opacities.detach()
+        opacities = self.model.gauss_params['opacities'].detach()
         opacities[labels < 0] = -100  # hide unclustered gaussians
-        self.model.opacities = torch.nn.Parameter(opacities.float())
+        self.model.gauss_params['opacities'] = torch.nn.Parameter(opacities.float())
 
         self.cluster_labels = torch.Tensor(labels)
-        features_dc = self.model.features_dc.detach()
-        features_rest = self.model.features_rest.detach()
+        features_dc = self.model.gauss_params['features_dc'].detach()
+        features_rest = self.model.gauss_params['features_rest'].detach()
         for c_id in range(0, labels.max() + 1):
             # set the colors of the gaussians accordingly using colormap from matplotlib
             cluster_mask = np.where(labels == c_id)
-            features_dc[cluster_mask] = RGB2SH(colormap[c_id, :3].to(self.model.features_dc))
+            features_dc[cluster_mask] = RGB2SH(colormap[c_id, :3].to(self.model.gauss_params['features_dc']))
             features_rest[cluster_mask] = 0
 
-        self.model.features_dc = torch.nn.Parameter(self.model.features_dc)
-        self.model.features_rest = torch.nn.Parameter(self.model.features_rest)
+        self.model.gauss_params['features_dc'] = torch.nn.Parameter(self.model.gauss_params['features_dc'])
+        self.model.gauss_params['features_rest'] = torch.nn.Parameter(self.model.gauss_params['features_rest'])
 
         self.cluster_scene.set_disabled(False)
         self.viewer_control.viewer._trigger_rerender()  # trigger viewer rerender
@@ -568,7 +550,7 @@ class GarfieldGaussianPipeline(VanillaPipeline):
         map_to_tensors = {}
 
         with torch.no_grad():
-            positions = self.model.means.cpu().numpy()
+            positions = self.model.gauss_params['means'].cpu().numpy()
             map_to_tensors["positions"] = o3d.core.Tensor(positions, o3d.core.float32)
             map_to_tensors["normals"] = o3d.core.Tensor(np.zeros_like(positions), o3d.core.float32)
 
@@ -583,13 +565,13 @@ class GarfieldGaussianPipeline(VanillaPipeline):
                 for i in range(shs.shape[-1]):
                     map_to_tensors[f"f_rest_{i}"] = shs[:, i]
 
-            map_to_tensors["opacity"] = self.model.opacities.data.cpu().numpy()
+            map_to_tensors["opacity"] = self.model.gauss_params['opacities'].data.cpu().numpy()
 
-            scales = self.model.scales.data.cpu().unsqueeze(-1).numpy()
+            scales = self.model.gauss_params['scales'].data.cpu().unsqueeze(-1).numpy()
             for i in range(3):
                 map_to_tensors[f"scale_{i}"] = scales[:, i]
 
-            quats = self.model.quats.data.cpu().unsqueeze(-1).numpy()
+            quats = self.model.gauss_params['quats'].data.cpu().unsqueeze(-1).numpy()
 
             for i in range(4):
                 map_to_tensors[f"rot_{i}"] = quats[:, i]
