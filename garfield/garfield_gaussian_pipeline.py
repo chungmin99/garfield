@@ -177,7 +177,7 @@ class GarfieldGaussianPipeline(VanillaPipeline):
     def _queue_state(self):
         """Save current state to stack"""
         import copy
-        self.state_stack.append(copy.deepcopy(self.model.gauss_params))
+        self.state_stack.append(copy.deepcopy({k:v.detach() for k,v in self.model.gauss_params.items()}))
         self.reset_state.set_disabled(False)
 
     def _click_gaussian(self, button: ViewerButton):
