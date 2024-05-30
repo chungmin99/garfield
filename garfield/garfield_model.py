@@ -41,7 +41,7 @@ class FeatureRenderer(nn.Module):
 @dataclass
 class GarfieldModelConfig(NerfactoModelConfig):
     _target: Type = field(default_factory=lambda: GarfieldModel)
-    instance_field: GarfieldFieldConfig = GarfieldFieldConfig()
+    instance_field: GarfieldFieldConfig = field(default_factory=lambda: GarfieldFieldConfig())
 
     max_grouping_scale: float = 2.0
     """Maximum scale to use for grouping supervision. Should be set during pipeline init."""

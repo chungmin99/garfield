@@ -20,8 +20,8 @@ class GarfieldPipelineConfig(VanillaPipelineConfig):
     _target: Type = field(default_factory=lambda: GarfieldPipeline)
     """target class to instantiate"""
 
-    datamanager: GarfieldDataManagerConfig = GarfieldDataManagerConfig()
-    model: GarfieldModelConfig = GarfieldModelConfig()
+    datamanager: GarfieldDataManagerConfig = field(default_factory=lambda: GarfieldDataManagerConfig())
+    model: GarfieldModelConfig = field(default_factory=lambda: GarfieldModelConfig())
 
     start_grouping_step: int = 2000
     max_grouping_scale: float = 2.0
