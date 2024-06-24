@@ -35,7 +35,7 @@ from garfield.garfield_pixel_sampler import GarfieldPixelSampler
 class GarfieldDataManagerConfig(VanillaDataManagerConfig):
     _target: Type = field(default_factory=lambda: GarfieldDataManager)
     """The datamanager class to use."""
-    img_group_model: ImgGroupModelConfig = field(default_factory=lambda: ImgGroupModelConfig)
+    img_group_model: ImgGroupModelConfig = field(default_factory=lambda: ImgGroupModelConfig())
     """The SAM model to use. This can be any other model that outputs masks..."""
 
 
