@@ -25,7 +25,7 @@ import tqdm
 from sklearn.preprocessing import QuantileTransformer
 from sklearn.neighbors import NearestNeighbors
 
-from gsplat._torch_impl import quat_to_rotmat
+from gsplat.cuda_legacy._torch_impl import quat_to_rotmat
 from scipy.spatial.transform import Rotation as Rot
 
 from garfield.garfield_datamanager import GarfieldDataManagerConfig, GarfieldDataManager
