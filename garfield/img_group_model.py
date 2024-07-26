@@ -18,7 +18,7 @@ from nerfstudio.configs import base_config as cfg
 class ImgGroupModelConfig(cfg.InstantiateConfig):
     _target: Type = field(default_factory=lambda: ImgGroupModel)
     """target class to instantiate"""
-    model_type: Literal["sam_fb", "sam_hf", "maskformer"] = "sam_fb"
+    model_type: Literal["sam_fb", "sam_hf", "maskformer", "superpixel"] = "sam_fb"
     """
     Currently supports:
      - "sam_fb": Original SAM model (from facebook github)
@@ -95,6 +95,20 @@ class ImgGroupModel:
             masks = [
                 (np.array(m['mask']) != 0)
                 for m in masks
+            ]
+            masks = sorted(masks, key=lambda x: x.sum())
+            return masks
+
+        elif self.config.model_type == "superpixel":
+            from skimage.segmentation import felzenszwalb, slic, quickshift, watershed
+            img = Image.fromarray(img)
+            # masks = slic(np.array(img), n_segments=100, compactness=10, channel_axis=2)
+            masks = felzenszwalb(img, scale=200, sigma=0.5, min_size=50)
+            if masks.max() <= 1:
+                masks = slic(np.array(img), n_segments=100, compactness=10, channel_axis=2)
+            masks = [
+                (masks == i)
+                for i in range(masks.max() + 1)
             ]
             masks = sorted(masks, key=lambda x: x.sum())
             return masks
